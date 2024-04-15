@@ -1,0 +1,17 @@
+[package]
+name = "byteos"
+authors = ["yfblock@321353225@qq.com"]
+description = "This package help you to build byteos quickly and easily."
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+inventory = "0.3.15"
+color-print = "0.3.5"
+version = "3.0.0"
+serde = {version = "1.0", features = ["derive"]}
+toml = "0.8"
+yaml-rust = "0.4"
+
+[profile.release]
+debug = true
