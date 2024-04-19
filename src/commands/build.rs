@@ -1,9 +1,11 @@
 use std::process::Command;
 
+use anyhow::Result;
+
 use crate::{config, CommandAndHandler};
 
 /// The handler of the command.
-fn handler(args: Vec<String>) -> Result<(), String> {
+fn handler(args: Vec<String>) -> Result<()> {
     let file_name = match args.len() > 2 {
         true => &args[2],
         false => "byteos.yaml",
@@ -22,18 +24,25 @@ fn handler(args: Vec<String>) -> Result<(), String> {
     // This rustflags will be passed to the rust build command.
     let binary_config = byteos_config
         .get_bin_config(bin)
-        .ok_or(format!("Can't find bin target {bin}"))?;
+        .ok_or(anyhow!("Can't find bin target {bin}"))?;
     for (key, value) in binary_config.configs {
         rustflags.push(format!("--cfg={}=\"{}\"", key, value));
         println!("{} = {:?}", key, value);
     }
 
+    let mut extra_args = Vec::new();
+
+    if binary_config.build_std.unwrap_or(false) {
+        extra_args.push("-Z");
+        extra_args.push("build-std");
+    }
+
     // build os
     let mut outputs = Command::new("cargo")
         .env("RUSTFLAGS", rustflags.join(" "))
+        .envs(binary_config.env)
         .arg("build")
-        .arg("-Z")
-        .arg("build-std")
+        .args(extra_args)
         .arg("--target")
         .arg(binary_config.target)
         .arg("--release")
@@ -43,7 +52,7 @@ fn handler(args: Vec<String>) -> Result<(), String> {
     // Wait for build complete.
     let exit_status = outputs.wait().expect("can't wait for build");
     if !exit_status.success() {
-        return Err(format!("build bin target {bin} failed, {exit_status}"));
+        return Err(anyhow!("build bin target {bin} failed, {exit_status}"));
     }
 
     if let Some(run_command) = binary_config.run {

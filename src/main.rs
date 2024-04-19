@@ -1,9 +1,12 @@
 use std::env;
 
+use anyhow::Result;
 use color_print::cprintln;
 
 #[macro_use]
 extern crate version;
+#[macro_use]
+extern crate anyhow;
 
 mod commands;
 mod config;
@@ -15,7 +18,7 @@ mod utils;
 pub struct CommandAndHandler {
     pub command: &'static str,
     pub description: &'static str,
-    pub handler: fn(Vec<String>) -> Result<(), String>,
+    pub handler: fn(Vec<String>) -> Result<()>,
 }
 
 impl CommandAndHandler {
@@ -23,7 +26,7 @@ impl CommandAndHandler {
     pub const fn new(
         command: &'static str,
         description: &'static str,
-        handler: fn(Vec<String>) -> Result<(), String>,
+        handler: fn(Vec<String>) -> Result<()>,
     ) -> Self {
         CommandAndHandler {
             command,
@@ -43,7 +46,7 @@ fn main() {
 }
 
 /// This function will execute the command. And return the result.
-fn exec() -> Result<(), String> {
+fn exec() -> Result<()> {
     // get arugments.
     let args: Vec<String> = env::args().collect();
     // print the help message if the number of the command if less than 2.

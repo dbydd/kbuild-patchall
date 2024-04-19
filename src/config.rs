@@ -1,5 +1,6 @@
 use std::{collections::HashMap, fs};
 
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 /// This is a struct will be deserialized from the given filename.
@@ -20,7 +21,9 @@ pub struct ByteOSConfig {
 pub struct BinaryConfig {
     pub target: String,
     pub run: Option<String>,
+    pub build_std: Option<bool>,
     pub configs: HashMap<String, String>,
+    pub env: HashMap<String, String>
 }
 
 impl ByteOSConfig {
@@ -32,8 +35,8 @@ impl ByteOSConfig {
     }
 }
 
-pub fn read_toml(path: &str) -> Result<ByteOSConfig, String> {
-    let fcontent = fs::read_to_string(path).map_err(|x| x.to_string())?;
-    let byteos_config: ByteOSConfig = toml::from_str(&fcontent).map_err(|x| x.to_string())?;
+pub fn read_toml(path: &str) -> Result<ByteOSConfig> {
+    let fcontent = fs::read_to_string(path)?;
+    let byteos_config: ByteOSConfig = toml::from_str(&fcontent)?;
     Ok(byteos_config)
 }

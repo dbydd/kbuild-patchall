@@ -1,5 +1,6 @@
 use std::{env::current_dir, fs, path::PathBuf, process::Command, sync::Mutex};
 
+use anyhow::Result;
 use color_print::cprintln;
 use yaml_rust::{Yaml, YamlLoader};
 
@@ -13,7 +14,7 @@ pub struct CloneItem {
 
 static CLONE_LIST: Mutex<Vec<CloneItem>> = Mutex::new(Vec::new());
 
-fn clone_from_git(path: &PathBuf, url: &str, commit: Option<&str>) -> Result<(), String> {
+fn clone_from_git(path: &PathBuf, url: &str, commit: Option<&str>) -> Result<()> {
     // Printing the clone information
     cprintln!(
         "<green>Cloning {}:{} -> {}</green>",
@@ -23,7 +24,7 @@ fn clone_from_git(path: &PathBuf, url: &str, commit: Option<&str>) -> Result<(),
     );
 
     // Clone the origin repository into path
-    let current_dir = current_dir().map_err(|x| x.to_string())?;
+    let current_dir = current_dir()?;
     let mut outputs = Command::new("git")
         .arg("clone")
         .arg(url)
@@ -46,7 +47,7 @@ fn clone_from_git(path: &PathBuf, url: &str, commit: Option<&str>) -> Result<(),
     Ok(())
 }
 
-fn checkout_from_yaml(path: &PathBuf, tree: &Yaml) -> Result<(), String> {
+fn checkout_from_yaml(path: &PathBuf, tree: &Yaml) -> Result<()> {
     if tree.is_badvalue() || tree.is_null() {
         return Ok(());
     }
@@ -59,7 +60,7 @@ fn checkout_from_yaml(path: &PathBuf, tree: &Yaml) -> Result<(), String> {
     }
     for (key, value) in tree.as_hash().expect("can't find a hashable table") {
         if key.is_badvalue() {
-            return Err(format!("bad key format: {key:?}"));
+            return Err(anyhow!("bad key format: {key:?}"));
         }
         let key = key.as_str().unwrap();
         if key == "commit" || key == "git" {
@@ -71,7 +72,7 @@ fn checkout_from_yaml(path: &PathBuf, tree: &Yaml) -> Result<(), String> {
 }
 
 /// The handler of the command.
-fn handler(args: Vec<String>) -> Result<(), String> {
+fn handler(args: Vec<String>) -> Result<()> {
     let file_name = match args.len() > 2 {
         true => &args[2],
         false => "byteos.yaml",

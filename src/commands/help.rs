@@ -1,9 +1,10 @@
+use anyhow::Result;
 use color_print::cprintln;
 
 use crate::CommandAndHandler;
 
 /// The command handler of the help command.
-pub fn handler(_args: Vec<String>) -> Result<(), String> {
+pub fn handler(_args: Vec<String>) -> Result<()> {
     println!("\nThe command below was available: \n");
     for command in inventory::iter::<CommandAndHandler> {
         cprintln!(

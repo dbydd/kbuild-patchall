@@ -1,11 +1,12 @@
 use std::str::FromStr;
 
+use anyhow::Result;
 use version::Version;
 
 use crate::CommandAndHandler;
 
 /// The command handler of the help command.
-pub fn handler(_args: Vec<String>) -> Result<(), String> {
+pub fn handler(_args: Vec<String>) -> Result<()> {
     let ver: Version = FromStr::from_str(version!()).unwrap();
     println!("Version: {}", ver);
     Ok(())
