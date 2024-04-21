@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::{env::current_dir, process::Command};
 
 use anyhow::Result;
 
@@ -40,6 +40,7 @@ fn handler(args: Vec<String>) -> Result<()> {
     // build os
     let mut outputs = Command::new("cargo")
         .env("RUSTFLAGS", rustflags.join(" "))
+        .env("ROOT_MANIFEST_DIR", current_dir().unwrap())
         .envs(binary_config.env)
         .arg("build")
         .args(extra_args)
