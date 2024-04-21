@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, process::exit};
 
 use anyhow::Result;
 use color_print::cprintln;
@@ -42,6 +42,7 @@ inventory::collect!(CommandAndHandler);
 fn main() {
     if let Err(err) = exec() {
         cprintln!("<red><bold>Error: {}</bold></red>", err);
+        exit(100);
     }
 }
 

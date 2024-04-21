@@ -233,5 +233,5 @@ pub fn handler(args: Vec<String>) -> Result<()> {
 
 // submit the command to CommandAndHandler Iterator.
 inventory::submit! {
-    CommandAndHandler::new("patch", "Downlaod crate from git and patch in Cargo.toml.", handler)
+    CommandAndHandler::new("patch", "Download crate from git and patch in Cargo.toml.", handler)
 }
