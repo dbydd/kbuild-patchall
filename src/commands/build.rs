@@ -1,6 +1,7 @@
 use std::{env::current_dir, process::Command};
 
 use anyhow::Result;
+use color_print::cprintln;
 
 use crate::{config::read_bin_config, CommandAndHandler};
 
@@ -28,8 +29,9 @@ fn handler(args: Vec<String>) -> Result<()> {
     }
 
     let mut extra_args = Vec::new();
-
-    if !binary_config.build_std {
+    
+    if binary_config.build_std {
+        cprintln!("<green>build_std</green>");
         extra_args.push("-Z");
         extra_args.push("build-std");
     }

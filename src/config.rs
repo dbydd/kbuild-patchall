@@ -3,6 +3,8 @@ use std::{collections::HashMap, fs};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
+pub fn default_as_false() -> bool { false }
+
 /// This is a struct will be deserialized from the given filename.
 ///
 /// version indicates the version of the byteos.
@@ -34,7 +36,7 @@ pub struct BinaryConfig {
     pub target: String,
     #[serde(skip)]
     global_config: ByteOSGlobalConfig,
-    #[serde(default)]
+    #[serde(default="default_as_false")]
     pub build_std: bool,
     #[serde(default)]
     configs: HashMap<String, String>,
