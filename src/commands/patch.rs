@@ -1,4 +1,8 @@
-use std::{env::current_dir, fs, process::{Command, Stdio}};
+use std::{
+    env::current_dir,
+    fs,
+    process::{Command, Stdio},
+};
 
 use anyhow::Result;
 use color_print::cprintln;
@@ -198,7 +202,8 @@ pub fn handler(args: Vec<String>) -> Result<()> {
                 .ok_or(anyhow!(
                     "can't find any matched package named {}",
                     patch_name
-                ))?.clone();
+                ))?
+                .clone();
             let process = Command::new("git")
                 .arg("status")
                 .arg("-s")
@@ -218,7 +223,11 @@ pub fn handler(args: Vec<String>) -> Result<()> {
             // remove patch from Cargo.toml
             let mut cargo_toml: Table = toml::from_str(&fs::read_to_string("Cargo.toml")?)?;
             let patch_table = cargo_toml.get_mut("patch").unwrap().as_table_mut().unwrap();
-            let git_table = patch_table.get_mut(&patched.git).unwrap().as_table_mut().unwrap();
+            let git_table = patch_table
+                .get_mut(&patched.git)
+                .unwrap()
+                .as_table_mut()
+                .unwrap();
             if git_table.len() == 1 {
                 patch_table.remove(&patched.git);
             } else {

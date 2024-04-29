@@ -10,29 +10,68 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ByteOSConfig {
     pub version: Option<String>,
+    #[serde(default)]
+    global: ByteOSGlobalConfig,
     // crates: Option<String>,
     // mocules: Option<String>,
     /// Config list for byteos. This field will be converted to rust cfg.
     // configs: Option<HashMap<String, String>>
-    pub bin: Option<HashMap<String, BinaryConfig>>,
+    #[serde(default)]
+    pub bin: HashMap<String, BinaryConfig>,
+}
+
+/// Global configuration
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
+pub struct ByteOSGlobalConfig {
+    #[serde(default)]
+    configs: HashMap<String, String>,
+    #[serde(default)]
+    env: HashMap<String, String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BinaryConfig {
     pub target: String,
-    pub run: Option<String>,
-    pub build_std: Option<bool>,
-    pub configs: HashMap<String, String>,
-    pub env: HashMap<String, String>
+    #[serde(skip)]
+    global_config: ByteOSGlobalConfig,
+    #[serde(default)]
+    pub build_std: bool,
+    #[serde(default)]
+    configs: HashMap<String, String>,
+    #[serde(default)]
+    env: HashMap<String, String>,
+}
+
+impl BinaryConfig {
+    pub fn get_configs(&self) -> HashMap<String, String> {
+        let mut configs = self.global_config.configs.clone();
+        configs.extend(self.configs.clone());
+        configs
+    }
+
+    pub fn get_envs(&self) -> HashMap<String, String> {
+        let mut envs = self.global_config.env.clone();
+        envs.extend(self.env.clone());
+        envs
+    }
 }
 
 impl ByteOSConfig {
-    pub fn get_bin_config(&self, bin: &str) -> Option<BinaryConfig> {
-        match self.bin {
-            Some(ref configs) => configs.get(bin).cloned(),
-            None => None,
-        }
+    pub fn get_bin_config(&self, bin: &str) -> Result<BinaryConfig> {
+        self.bin
+            .get(bin)
+            .ok_or(anyhow!("can't find binary_config"))
+            .map(|x| {
+                let mut config = x.clone();
+                config.global_config = self.global.clone();
+                config
+            })
     }
+}
+
+pub fn read_bin_config(path: &str, bin: &str) -> Result<BinaryConfig> {
+    let os_config = read_toml(path)?;
+    os_config.get_bin_config(bin)
 }
 
 pub fn read_toml(path: &str) -> Result<ByteOSConfig> {
