@@ -2,7 +2,7 @@
 name = "kbuild"
 authors = ["yfblock@321353225@qq.com"]
 description = "This package help you to build rust kernel quickly and easily."
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/Byte-OS/kbuild"
