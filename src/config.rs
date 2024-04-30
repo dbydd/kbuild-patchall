@@ -3,7 +3,9 @@ use std::{collections::HashMap, fs};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-pub fn default_as_false() -> bool { false }
+pub fn default_as_false() -> bool {
+    false
+}
 
 /// This is a struct will be deserialized from the given filename.
 ///
@@ -33,7 +35,7 @@ pub struct BinaryConfig {
     pub target: String,
     #[serde(skip)]
     global_config: KernelGlobalConfig,
-    #[serde(default="default_as_false")]
+    #[serde(default = "default_as_false")]
     pub build_std: bool,
     #[serde(default)]
     configs: HashMap<String, String>,

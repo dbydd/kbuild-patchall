@@ -29,7 +29,7 @@ fn handler(args: Vec<String>) -> Result<()> {
     }
 
     let mut extra_args = Vec::new();
-    
+
     if binary_config.build_std {
         cprintln!("<green>build_std</green>");
         extra_args.push("-Z");

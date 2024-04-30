@@ -8,14 +8,6 @@
 cargo install kbuild
 ```
 
-## Download kernel
-
-```shell
-kbuild download test.yaml
-```
-
-test.yaml is the file that contains the file tree about the module of the kbuild.
-
 ## Build kernel
 
 ```shell
