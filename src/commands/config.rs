@@ -5,7 +5,7 @@ use crate::{config::read_bin_config, CommandAndHandler};
 /// The handler of the command.
 fn handler(args: Vec<String>) -> Result<()> {
     if args.len() < 5 || (args[4] != "get_env" && args[4] != "get_cfg") {
-        println!("byteos [config_file] [bin] [get_env|get_cfg] [name]");
+        println!("kbuild [config_file] [bin] [get_env|get_cfg] [name]");
     }
 
     let file_name = args[2].as_str();
@@ -13,7 +13,7 @@ fn handler(args: Vec<String>) -> Result<()> {
     let ops = args[4].as_str();
     let name = args[5].as_str();
 
-    // Convert byteos configuration to rustflags.
+    // Convert kernel configuration to rustflags.
     // This rustflags will be passed to the rust build command.
     let binary_config = read_bin_config(&file_name, bin)?;
 

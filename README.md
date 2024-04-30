@@ -1,25 +1,25 @@
-# cargo-byteos
+# kbuild
 
-> This is a cargo tool for building byteos.
+> This is a cargo tool for building a rust os.
 
 ## Installation
 
 ```shell
-cargo install --git https://github.com/Byte-OS/cargo-byteos.git
+cargo install kbuild
 ```
 
 ## Download kernel
 
 ```shell
-byteos download test.yaml
+kbuild download test.yaml
 ```
 
-test.yaml is the file that contains the file tree about the module of the byteos.
+test.yaml is the file that contains the file tree about the module of the kbuild.
 
 ## Build kernel
 
 ```shell
-byteos build test.toml riscv64-qemu
+kbuild build test.toml riscv64-qemu
 ```
 
-TIPS: test.toml is the config included in the byteos.
+TIPS: test.toml is the config included in the kbuild.

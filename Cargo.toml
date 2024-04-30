@@ -1,7 +1,7 @@
 [package]
-name = "byteos"
+name = "kbuild"
 authors = ["yfblock@321353225@qq.com"]
-description = "This package help you to build byteos quickly and easily."
+description = "This package help you to build rust kernel quickly and easily."
 version = "0.1.0"
 edition = "2021"
 

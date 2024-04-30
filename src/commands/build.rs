@@ -9,7 +9,7 @@ use crate::{config::read_bin_config, CommandAndHandler};
 fn handler(args: Vec<String>) -> Result<()> {
     let file_name = match args.len() > 2 {
         true => &args[2],
-        false => "byteos.yaml",
+        false => "default.yaml",
     };
 
     let bin = if args.len() > 3 { &args[3] } else { "default" };
@@ -20,7 +20,7 @@ fn handler(args: Vec<String>) -> Result<()> {
     rustflags.push(String::from("-Clink-arg=-no-pie"));
     rustflags.push(String::from("-Ztls-model=local-exec"));
 
-    // Convert byteos configuration to rustflags.
+    // Convert kernel configuration to rustflags.
     // This rustflags will be passed to the rust build command.
     let binary_config = read_bin_config(file_name, bin)?;
     for (key, value) in binary_config.get_configs() {
@@ -47,7 +47,7 @@ fn handler(args: Vec<String>) -> Result<()> {
         .arg(binary_config.target)
         .arg("--release")
         .spawn()
-        .expect("can't build byteos");
+        .expect("can't build kernel");
 
     // Wait for build complete.
     let exit_status = outputs.wait().expect("can't wait for build");
@@ -59,5 +59,5 @@ fn handler(args: Vec<String>) -> Result<()> {
 }
 
 inventory::submit! {
-    CommandAndHandler::new("build", "build the byteos through a yaml.", handler)
+    CommandAndHandler::new("build", "build the kernel through a yaml.", handler)
 }

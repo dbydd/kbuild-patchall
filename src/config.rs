@@ -7,24 +7,21 @@ pub fn default_as_false() -> bool { false }
 
 /// This is a struct will be deserialized from the given filename.
 ///
-/// version indicates the version of the byteos.
-/// config indicates the configuration of the byteos.
+/// version indicates the version of the kernel.
+/// config indicates the configuration of the kernel.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct ByteOSConfig {
+pub struct KernelConfig {
     pub version: Option<String>,
     #[serde(default)]
-    global: ByteOSGlobalConfig,
-    // crates: Option<String>,
-    // mocules: Option<String>,
-    /// Config list for byteos. This field will be converted to rust cfg.
-    // configs: Option<HashMap<String, String>>
+    global: KernelGlobalConfig,
+    /// Config list for kernel. This field will be converted to rust cfg.
     #[serde(default)]
     pub bin: HashMap<String, BinaryConfig>,
 }
 
 /// Global configuration
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Default)]
-pub struct ByteOSGlobalConfig {
+pub struct KernelGlobalConfig {
     #[serde(default)]
     configs: HashMap<String, String>,
     #[serde(default)]
@@ -35,7 +32,7 @@ pub struct ByteOSGlobalConfig {
 pub struct BinaryConfig {
     pub target: String,
     #[serde(skip)]
-    global_config: ByteOSGlobalConfig,
+    global_config: KernelGlobalConfig,
     #[serde(default="default_as_false")]
     pub build_std: bool,
     #[serde(default)]
@@ -58,7 +55,7 @@ impl BinaryConfig {
     }
 }
 
-impl ByteOSConfig {
+impl KernelConfig {
     pub fn get_bin_config(&self, bin: &str) -> Result<BinaryConfig> {
         self.bin
             .get(bin)
@@ -76,8 +73,8 @@ pub fn read_bin_config(path: &str, bin: &str) -> Result<BinaryConfig> {
     os_config.get_bin_config(bin)
 }
 
-pub fn read_toml(path: &str) -> Result<ByteOSConfig> {
+pub fn read_toml(path: &str) -> Result<KernelConfig> {
     let fcontent = fs::read_to_string(path)?;
-    let byteos_config: ByteOSConfig = toml::from_str(&fcontent)?;
-    Ok(byteos_config)
+    let kernel_config: KernelConfig = toml::from_str(&fcontent)?;
+    Ok(kernel_config)
 }

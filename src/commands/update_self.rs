@@ -8,8 +8,7 @@ use crate::CommandAndHandler;
 pub fn handler(_args: Vec<String>) -> Result<()> {
     let mut outputs = Command::new("cargo")
         .arg("install")
-        .arg("--git")
-        .arg("https://github.com/Byte-OS/cargo-byteos.git")
+        .arg("kbuild")
         .spawn()
         .expect("can't clone from git repository");
     outputs.wait().expect("can't wait for git clone");

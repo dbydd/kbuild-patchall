@@ -9,19 +9,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f538837af36e6f6a9be0faa67f9a314f8119e4e4b5867c6ab40ed60360142519"
 
 [[package]]
-name = "byteos"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "color-print",
- "inventory",
- "serde",
- "toml",
- "version",
- "yaml-rust",
-]
-
-[[package]]
 name = "color-print"
 version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -69,6 +56,19 @@ name = "inventory"
 version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f958d3d68f4167080a18141e10381e7634563984a537f2a49a30fd8e53ac5767"
+
+[[package]]
+name = "kbuild"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "color-print",
+ "inventory",
+ "serde",
+ "toml",
+ "version",
+ "yaml-rust",
+]
 
 [[package]]
 name = "linked-hash-map"

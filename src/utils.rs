@@ -1,5 +1,6 @@
 use std::io::{stdin, stdout, Write};
 
+#[allow(dead_code)]
 pub fn confirm(tip: &str, default: bool) -> bool {
     let end = if default { " [Y/n]: " } else { " [y/N]: " };
     print!("{tip} {end}");
