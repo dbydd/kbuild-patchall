@@ -3,10 +3,6 @@ use std::{collections::HashMap, fs};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-pub fn default_as_false() -> bool {
-    false
-}
-
 /// This is a struct will be deserialized from the given filename.
 ///
 /// version indicates the version of the kernel.
@@ -35,8 +31,8 @@ pub struct BinaryConfig {
     pub target: String,
     #[serde(skip)]
     global_config: KernelGlobalConfig,
-    #[serde(default = "default_as_false")]
-    pub build_std: bool,
+    /// Build std args
+    pub build_std: Option<String>,
     #[serde(default)]
     configs: HashMap<String, String>,
     #[serde(default)]
@@ -71,12 +67,24 @@ impl KernelConfig {
 }
 
 pub fn read_bin_config(path: &str, bin: &str) -> Result<BinaryConfig> {
-    let os_config = read_toml(path)?;
+    let os_config = if path.ends_with(".yml") || path.ends_with(".yaml") {
+        read_yaml(path)
+    } else {
+        read_toml(path)
+    }?;
     os_config.get_bin_config(bin)
 }
 
+/// Read config from toml
 pub fn read_toml(path: &str) -> Result<KernelConfig> {
     let fcontent = fs::read_to_string(path)?;
     let kernel_config: KernelConfig = toml::from_str(&fcontent)?;
+    Ok(kernel_config)
+}
+
+/// Read config from yaml
+pub fn read_yaml(path: &str) -> Result<KernelConfig> {
+    let fcontent = fs::read_to_string(path)?;
+    let kernel_config: KernelConfig = serde_yaml::from_str(&fcontent)?;
     Ok(kernel_config)
 }

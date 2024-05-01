@@ -9,7 +9,7 @@ use crate::{config::read_bin_config, CommandAndHandler};
 fn handler(args: Vec<String>) -> Result<()> {
     let file_name = match args.len() > 2 {
         true => &args[2],
-        false => "default.yaml",
+        false => "default.toml",
     };
 
     let bin = if args.len() > 3 { &args[3] } else { "default" };
@@ -30,10 +30,10 @@ fn handler(args: Vec<String>) -> Result<()> {
 
     let mut extra_args = Vec::new();
 
-    if binary_config.build_std {
+    if let Some(ref build_std) = binary_config.build_std {
         cprintln!("<green>build_std</green>");
-        extra_args.push("-Z");
-        extra_args.push("build-std");
+        extra_args.push(String::from("-Z"));
+        extra_args.push(format!("build-std={build_std}"));
     }
 
     // build os
