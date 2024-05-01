@@ -1,11 +1,15 @@
+use std::process::{Command, Stdio};
+
 use anyhow::Result;
 
 use crate::{config::read_bin_config, CommandAndHandler};
 
 /// The handler of the command.
 fn handler(args: Vec<String>) -> Result<()> {
-    if args.len() < 5 || (args[4] != "get_env" && args[4] != "get_cfg") {
-        println!("kbuild [config_file] [bin] [get_env|get_cfg] [name]");
+    let commands = vec!["get_env", "get_cfg", "get_triple", "get_meta"];
+    if args.len() < 5 || (!commands.contains(&args[4].as_str())) {
+        println!("kbuild [config_file] [bin] [{}] [name]", commands.join("|"));
+        return Ok(());
     }
 
     let file_name = args[2].as_str();
@@ -28,6 +32,27 @@ fn handler(args: Vec<String>) -> Result<()> {
             .get(name)
             .cloned()
             .ok_or(anyhow!("Can't find config {name}")),
+        "get_triple" => {
+            // -Z unstable-options --print target-spec-json --target riscv64gc-unknown-none-elf
+            let task = Command::new("rustc")
+                .args(vec!["+nightly", "-Z", "unstable-options"])
+                .args(vec!["--print", "target-spec-json"])
+                .args(vec!["--target", &binary_config.target])
+                .stdout(Stdio::piped())
+                .spawn()?;
+            let outputs = task.wait_with_output()?;
+            let str = String::from_utf8(outputs.stdout)?;
+            let triple = json::parse(&str)?;
+            triple[name]
+                .as_str()
+                .ok_or(anyhow!("can't get {name} from triple"))
+                .map(|x| x.to_string())
+        }
+        "get_meta" => binary_config
+            .get_meta()
+            .get(name)
+            .cloned()
+            .ok_or(anyhow!("can't find meta {name}")),
         _ => unreachable!(),
     }?;
 

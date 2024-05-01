@@ -51,6 +51,12 @@ impl BinaryConfig {
         envs.extend(self.env.clone());
         envs
     }
+
+    pub fn get_meta(&self) -> HashMap<String, String> {
+        let mut meta = HashMap::new();
+        meta.insert(String::from("target"), self.target.clone());
+        meta
+    }
 }
 
 impl KernelConfig {
