@@ -97,7 +97,7 @@ fn git_https_to_ssh(git: &str) -> Result<String> {
     Ok(ssh_url)
 }
 
-pub fn do_patch(name: &str, git: &str, commit: &str) -> Result<()> {
+pub fn do_patch(name: &str, git: &str, commit: &str, https: bool) -> Result<()> {
     cprintln!(
         "<green>Patching {}:{} -> crates/{}</green>",
         git,
@@ -107,7 +107,10 @@ pub fn do_patch(name: &str, git: &str, commit: &str) -> Result<()> {
 
     let mut outputs = Command::new("git")
         .arg("clone")
-        .arg(git_https_to_ssh(git)?)
+        .arg(match https {
+            true => String::from(git),
+            false => git_https_to_ssh(git)?
+        })
         .arg(format!("crates/{}", name))
         .spawn()?;
     outputs.wait()?;
@@ -190,7 +193,7 @@ pub fn handler(args: Vec<String>) -> Result<()> {
 
             // TODO: Check if the rev exists. use rev instead of the hash commit.
             // Do the patch
-            do_patch(&patch_name, git_url, commit)?;
+            do_patch(&patch_name, git_url, commit, args.contains(&String::from("--https")))?;
         }
         "remove" => {
             let patch_name = args[3].clone();
