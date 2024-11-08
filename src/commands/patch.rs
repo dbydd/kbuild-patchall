@@ -6,6 +6,7 @@ use std::{
 
 use anyhow::Result;
 use color_print::cprintln;
+use inventory::iter;
 use serde::{Deserialize, Serialize};
 use toml::Table;
 
@@ -109,7 +110,7 @@ pub fn do_patch(name: &str, git: &str, commit: &str, https: bool) -> Result<()> 
         .arg("clone")
         .arg(match https {
             true => String::from(git),
-            false => git_https_to_ssh(git)?
+            false => git_https_to_ssh(git)?,
         })
         .arg(format!("crates/{}", name))
         .spawn()?;
@@ -193,7 +194,41 @@ pub fn handler(args: Vec<String>) -> Result<()> {
 
             // TODO: Check if the rev exists. use rev instead of the hash commit.
             // Do the patch
-            do_patch(&patch_name, git_url, commit, args.contains(&String::from("--https")))?;
+            do_patch(
+                &patch_name,
+                git_url,
+                commit,
+                args.contains(&String::from("--https")),
+            )?;
+        }
+        "patch_all" => {
+            let do_not_patch = get_patched_table().map(|table| {
+                table
+                    .iter()
+                    .map(|pack| pack.name.clone())
+                    .collect::<Vec<_>>()
+            })?;
+            for patch in get_patch_table()?
+                .iter()
+                .filter(|a| do_not_patch.binary_search(&a.name).is_err())
+            {
+                let urls: Vec<&str> = patch.source.as_ref().unwrap().split("#").collect();
+                if urls.len() < 2 {
+                    return Err(anyhow!("This is not a valid patch source"));
+                }
+                let commit = urls[1];
+                let git_url_end = urls[0].find('?').unwrap_or(urls[0].len());
+                let git_url = &urls[0][4..git_url_end];
+
+                // TODO: Check if the rev exists. use rev instead of the hash commit.
+                // Do the patch
+                do_patch(
+                    &patch.name,
+                    git_url,
+                    commit,
+                    args.contains(&String::from("--https")),
+                )?;
+            }
         }
         "remove" => {
             let patch_name = args[3].clone();
