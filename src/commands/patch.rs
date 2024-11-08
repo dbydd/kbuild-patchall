@@ -6,7 +6,6 @@ use std::{
 
 use anyhow::Result;
 use color_print::cprintln;
-use inventory::iter;
 use serde::{Deserialize, Serialize};
 use toml::Table;
 
@@ -249,7 +248,7 @@ pub fn handler(args: Vec<String>) -> Result<()> {
                 .stdout(Stdio::piped())
                 .spawn()?;
             let outputs = process.wait_with_output()?;
-            if outputs.stdout.len() != 0 {
+            if !outputs.stdout.is_empty() {
                 println!();
                 println!("{}", String::from_utf8(outputs.stdout.clone())?);
                 return Err(anyhow!("You have some files unhandle, please ensure this package don't have any item to handle"));

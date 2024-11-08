@@ -6,7 +6,7 @@ use crate::{config::read_bin_config, CommandAndHandler};
 
 /// The handler of the command.
 fn handler(args: Vec<String>) -> Result<()> {
-    let commands = vec!["get_env", "get_cfg", "get_triple", "get_meta"];
+    let commands = ["get_env", "get_cfg", "get_triple", "get_meta"];
     if args.len() < 5 || (!commands.contains(&args[4].as_str())) {
         println!("kbuild [config_file] [bin] [{}] [name]", commands.join("|"));
         return Ok(());
@@ -19,7 +19,7 @@ fn handler(args: Vec<String>) -> Result<()> {
 
     // Convert kernel configuration to rustflags.
     // This rustflags will be passed to the rust build command.
-    let binary_config = read_bin_config(&file_name, bin)?;
+    let binary_config = read_bin_config(file_name, bin)?;
 
     let value = match ops {
         "get_env" => binary_config
