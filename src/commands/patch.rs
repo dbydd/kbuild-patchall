@@ -4,7 +4,7 @@ use std::{
     process::{Command, Stdio},
 };
 
-use anyhow::Result;
+use anyhow::{Ok, Result};
 use color_print::cprintln;
 use serde::{Deserialize, Serialize};
 use toml::Table;
@@ -271,6 +271,42 @@ pub fn handler(args: Vec<String>) -> Result<()> {
                 git_table.remove(&patched.name);
             }
             fs::write("Cargo.toml", toml::to_string(&cargo_toml)?)?;
+        }
+        "remove_all" => {
+            for patched in get_patched_table()?.iter() {
+                let process = Command::new("git")
+                    .arg("status")
+                    .arg("-s")
+                    .current_dir(current_dir()?.join(format!("crates/{}", patched.name)))
+                    .stdout(Stdio::piped())
+                    .spawn()?;
+                let outputs = process.wait_with_output()?;
+                if !outputs.stdout.is_empty() {
+                    println!();
+                    println!("{}", String::from_utf8(outputs.stdout.clone())?);
+                    return Err(anyhow!("Your crate {} have some files unhandle, please ensure this package don't have any item to handle",patched.name));
+                }
+            }
+
+            for patched in get_patched_table()?.iter() {
+                // remove patch from disk
+                fs::remove_dir_all(format!("crates/{}", patched.name))?;
+
+                // remove patch from Cargo.toml
+                let mut cargo_toml: Table = toml::from_str(&fs::read_to_string("Cargo.toml")?)?;
+                let patch_table = cargo_toml.get_mut("patch").unwrap().as_table_mut().unwrap();
+                let git_table = patch_table
+                    .get_mut(&patched.git)
+                    .unwrap()
+                    .as_table_mut()
+                    .unwrap();
+                if git_table.len() == 1 {
+                    patch_table.remove(&patched.git);
+                } else {
+                    git_table.remove(&patched.name);
+                }
+                fs::write("Cargo.toml", toml::to_string(&cargo_toml)?)?;
+            }
         }
         _ => {}
     }
